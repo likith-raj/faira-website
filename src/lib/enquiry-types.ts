@@ -29,7 +29,7 @@ export const SERVICE_OPTIONS = [
   { id: "unsure", label: "Not Sure Yet" }
 ];
 
-export const BUDGETS = ["₹3,000 – ₹6,000", "₹6,000 – ₹12,000", "₹10,000 – ₹25,000", "₹25,000+"];
+export const BUDGETS = ["Starting ₹1,500", "₹1,500 – ₹5,000", "₹5,000 – ₹15,000", "₹15,000+"];
 export const TIMELINES = ["ASAP", "2–4 weeks", "1–2 months", "Just exploring"];
 export const BUSINESS_TYPES = ["Restaurant", "Clinic", "Real Estate", "Coaching", "Retail", "Other"];
 

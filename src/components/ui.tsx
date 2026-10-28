@@ -57,8 +57,8 @@ export function GradientButton({
   disabled?: boolean;
 }) {
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-xl font-medium uppercase tracking-[0.2em] text-white bg-accent px-8 py-4 text-sm",
-    "shadow-glow transition-all duration-300 hover:bg-accent-deep hover:-translate-y-0.5",
+    "inline-flex items-center justify-center gap-2 rounded-xl font-medium uppercase tracking-[0.2em] text-white bg-accent px-6 py-3.5 text-sm md:px-8 md:py-4",
+    "shadow-glow transition-all duration-300 hover:bg-accent-deep hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.99]",
     "focus-ring disabled:opacity-50 disabled:pointer-events-none",
     className
   );
@@ -87,8 +87,8 @@ export function GhostButton({
   className?: string;
 }) {
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-ink backdrop-blur-xl",
-    "transition-colors duration-300 hover:border-accent hover:text-accent focus-ring",
+    "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-medium uppercase tracking-[0.2em] text-ink backdrop-blur-xl md:px-8 md:py-4",
+    "transition-all duration-300 hover:border-accent hover:text-accent hover:scale-[1.02] active:scale-[0.99] focus-ring",
     className
   );
   if (href)
@@ -120,12 +120,12 @@ export function SectionWrapper({
   className?: string;
 }) {
   return (
-    <section id={id} className={cn("relative mx-auto w-full max-w-[90%] px-4 py-20 md:px-12 md:py-28", className)}>
+    <section id={id} className={cn("relative mx-auto w-full max-w-[95%] px-4 py-16 md:px-12 md:py-24", className)}>
       {(eyebrow || title) && (
-        <Reveal className="mb-12 max-w-3xl">
+        <Reveal className="mb-12 w-full">
           {eyebrow && <p className="mono-label mb-3 text-accent">{eyebrow}</p>}
-          {title && <h2 className="font-display text-2xl font-light uppercase leading-[1.3] tracking-[0.2em] md:text-4xl">{title}</h2>}
-          {subtitle && <p className="mt-3 text-lg text-ink-dim">{subtitle}</p>}
+          {title && <h2 className="font-display text-2xl font-normal uppercase leading-[1.3] tracking-[0.15em] md:text-4xl">{title}</h2>}
+          {subtitle && <p className="mt-3 max-w-3xl text-base md:text-lg text-ink-dim">{subtitle}</p>}
         </Reveal>
       )}
       {children}

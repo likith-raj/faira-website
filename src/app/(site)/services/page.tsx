@@ -31,7 +31,7 @@ const SECTIONS = [
       "Booking / reservation pages"
     ],
     ideal: "Restaurants, clinics, shops, coaching centres, real-estate agencies.",
-    price: "Starting ₹3,000"
+    price: "Starting ₹1,500"
   },
   {
     id: "webapp",
@@ -47,7 +47,7 @@ const SECTIONS = [
       "Third-party API integrations (payments, SMS, maps)"
     ],
     ideal: "Growing businesses drowning in spreadsheets and WhatsApp chats.",
-    price: "Custom quote — typically ₹15,000+"
+    price: "Starting ₹1,500"
   },
   {
     id: "mobileapp",
@@ -62,7 +62,7 @@ const SECTIONS = [
       "Play Store & App Store publishing support"
     ],
     ideal: "Businesses ready to go mobile with an existing customer base.",
-    price: "Custom quote"
+    price: "Starting ₹1,500"
   },
   {
     id: "automation",
@@ -77,7 +77,7 @@ const SECTIONS = [
       "AI content tools for menus, posts and offers"
     ],
     ideal: "Any business losing leads because replies come too late.",
-    price: "Starting ₹5,000"
+    price: "Starting ₹1,500"
   }
 ];
 

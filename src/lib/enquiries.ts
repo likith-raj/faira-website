@@ -82,11 +82,11 @@ function seedIfEmpty(list: Enquiry[]): Enquiry[] {
   const now = Date.now();
   type Row = [string, string, string[], string, string, string, string, string, string, string];
   const seedRows: Row[] = [
-    ["Spice Route Restaurant", "Restaurant", ["website", "booking"], "₹6,000 – ₹12,000", "2–4 weeks", "Ramesh Reddy", "9849xxxxx12", "chef@spiceroute.in", "Nellore", "Need a menu website with online table reservation."],
-    ["Sunrise Clinic", "Clinic", ["website", "leads"], "₹10,000 – ₹25,000", "1–2 months", "Dr. Lakshmi", "9849xxxxx34", "admin@sunriseclinic.in", "Nellore", "Appointment booking + patient enquiry forms."],
-    ["UrbanKart", "Retail", ["website", "ecommerce"], "₹25,000+", "Just exploring", "Abdul Kareem", "9849xxxxx56", "orders@urbankart.in", "Nellore", "Online catalog with WhatsApp ordering."],
-    ["BrightPath Academy", "Coaching", ["website", "leads"], "₹6,000 – ₹12,000", "ASAP", "Suresh Kumar", "9849xxxxx78", "brightpath@gmail.com", "Nellore", "Admission enquiry form and toppers page."],
-    ["Nellore Homes", "Real Estate", ["webapp", "leads"], "₹25,000+", "1–2 months", "Vijay Properties", "9849xxxxx90", "info@nellorehomes.in", "Nellore", "Property listings dashboard with lead management."]
+    ["Spice Route Restaurant", "Restaurant", ["website", "booking"], "₹1,500 – ₹6,000", "2–4 weeks", "Ramesh Reddy", "9849xxxxx12", "chef@spiceroute.in", "Nellore", "Need a menu website with online table reservation."],
+    ["Sunrise Clinic", "Clinic", ["website", "leads"], "₹6,000 – ₹15,000", "1–2 months", "Dr. Lakshmi", "9849xxxxx34", "admin@sunriseclinic.in", "Nellore", "Appointment booking + patient enquiry forms."],
+    ["UrbanKart", "Retail", ["website", "ecommerce"], "₹15,000+", "Just exploring", "Abdul Kareem", "9849xxxxx56", "orders@urbankart.in", "Nellore", "Online catalog with WhatsApp ordering."],
+    ["BrightPath Academy", "Coaching", ["website", "leads"], "₹1,500 – ₹6,000", "ASAP", "Suresh Kumar", "9849xxxxx78", "brightpath@gmail.com", "Nellore", "Admission enquiry form and toppers page."],
+    ["Nellore Homes", "Real Estate", ["webapp", "leads"], "₹15,000+", "1–2 months", "Vijay Properties", "9849xxxxx90", "info@nellorehomes.in", "Nellore", "Property listings dashboard with lead management."]
   ];
   const seed: Enquiry[] = seedRows.map((r, i) => ({
     id: `seed-${i}`,

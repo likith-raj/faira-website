@@ -24,15 +24,15 @@ export default function HomePage() {
   return (
     <>
       {/* ================= HERO ================= */}
-      <section className="relative w-full max-w-[90%] mx-auto px-4 md:px-12 pt-40 pb-24 md:pt-48 md:pb-32">
-        <div className="mx-auto max-w-4xl text-center">
+      <section className="relative w-full max-w-[95%] mx-auto px-4 md:px-12 pt-28 pb-20 md:pt-36 md:pb-28">
+        <div className="mx-auto w-full max-w-none text-center">
           <Reveal>
             <span className="mono-label inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-medium text-accent backdrop-blur-xl">
               <MapPin className="h-3.5 w-3.5" /> Nellore · Andhra Pradesh
             </span>
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="mt-8 text-4xl md:text-6xl lg:text-7xl font-light uppercase tracking-[0.2em] leading-[1.2] text-white">
+            <h1 className="mt-8 w-full text-3xl md:text-5xl font-normal uppercase tracking-[0.2em] leading-[1.25] text-white">
               Your local business.{" "}
               <span className="text-accent">Built for the digital world.</span>
             </h1>
@@ -218,7 +218,7 @@ export default function HomePage() {
       <SectionWrapper className="!py-14">
         <Reveal>
           <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-r from-accent to-accent-deep px-8 py-16 text-center text-white md:px-16">
-            <h2 className="font-display text-2xl md:text-4xl font-light uppercase tracking-[0.2em] leading-[1.3] text-white">
+            <h2 className="font-display text-2xl md:text-4xl font-normal uppercase tracking-[0.15em] leading-[1.3] text-white">
               Ready to take your business online?
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-lg font-normal text-white/85">

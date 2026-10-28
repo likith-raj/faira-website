@@ -103,11 +103,11 @@ export const DEMOS = [
 ];
 
 export const PRICING = [
-  { name: "Basic Website", price: "₹3,000–6,000", desc: "Up to 5 pages, mobile-first, contact form, SEO basics." },
-  { name: "Extended Website", price: "₹6,000–12,000", desc: "10+ pages, CMS/blogs, booking pages, advanced SEO." },
-  { name: "Booking / Lead System", price: "₹10,000+", desc: "Online booking, lead forms, admin panel to manage enquiries." },
-  { name: "Custom Web App", price: "Custom Quote", desc: "Dashboards, portals, CRM-lite, inventory and reporting systems." },
-  { name: "Mobile App", price: "Custom Quote", desc: "Android + iOS apps built with React Native / Flutter." }
+  { name: "Basic Website", price: "Starting at ₹1,500", desc: "Up to 5 pages, mobile-first, contact form, SEO basics." },
+  { name: "Extended Website", price: "Starting at ₹1,500", desc: "10+ pages, CMS/blogs, booking pages, advanced SEO." },
+  { name: "Booking / Lead System", price: "Starting at ₹1,500", desc: "Online booking, lead forms, admin panel to manage enquiries." },
+  { name: "Custom Web App", price: "Starting at ₹1,500", desc: "Dashboards, portals, CRM-lite, inventory and reporting systems." },
+  { name: "Mobile App", price: "Starting at ₹1,500", desc: "Android + iOS apps built with React Native / Flutter." }
 ];
 
 export const PROCESS = [

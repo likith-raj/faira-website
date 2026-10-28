@@ -33,12 +33,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ballon d'Or style: ALL CAPS, elegant and WIDE — light weight, generous tracking */
+/* Elegant caps headings — medium weight, generous but not overpowering tracking */
 main h1,
 main h2,
 .font-display {
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
 }
 
 ::selection {
@@ -102,7 +102,7 @@ main h2,
     transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
   .glass-hover:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) rotate(0.35deg);
     box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(224, 90, 51, 0.12);
   }
   .text-gradient {
