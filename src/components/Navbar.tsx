@@ -1,32 +1,41 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Home, LayoutGrid, Users, MessageSquare } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-[95%] items-center justify-between px-4 md:px-12">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="font-display text-xl font-black uppercase tracking-[0.3em] text-white">FAIRA</span>
+    <motion.div 
+      initial={{ y: 100, opacity: 0 }} 
+      animate={{ y: 0, opacity: 1 }} 
+      transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+    >
+      <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-4 py-3 backdrop-blur-xl shadow-2xl">
+        <Link href="/" className="group flex flex-col items-center gap-1 px-4 py-1 text-zinc-400 hover:text-[#E05A33] transition-colors">
+          <Home className="h-5 w-5" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Home</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-8">
-          {["Services", "Demos", "About", "Contact"].map((item) => (
-            <Link key={item} href={`/${item.toLowerCase()}`} className="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-[#E05A33]">{item}</Link>
-          ))}
-        </nav>
-        <Link href="/quote" className="hidden md:inline-flex bg-[#E05A33] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white rounded hover:bg-[#C94A25]">Get a Consultation</Link>
-        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>{isOpen ? <X /> : <Menu />}</button>
+        <div className="h-8 w-[1px] bg-white/10" />
+        <Link href="/services" className="group flex flex-col items-center gap-1 px-4 py-1 text-zinc-400 hover:text-[#E05A33] transition-colors">
+          <LayoutGrid className="h-5 w-5" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Services</span>
+        </Link>
+        <div className="h-8 w-[1px] bg-white/10" />
+        <Link href="/about" className="group flex flex-col items-center gap-1 px-4 py-1 text-zinc-400 hover:text-[#E05A33] transition-colors">
+          <Users className="h-5 w-5" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">About</span>
+        </Link>
+        <div className="h-8 w-[1px] bg-white/10" />
+        <Link href="/contact" className="group flex flex-col items-center gap-1 px-4 py-1 text-zinc-400 hover:text-[#E05A33] transition-colors">
+          <MessageSquare className="h-5 w-5" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Contact</span>
+        </Link>
+        <div className="h-8 w-[1px] bg-white/10" />
+        <Link href="/quote" className="ml-2 rounded-full bg-[#E05A33] px-6 py-2 text-xs font-black uppercase tracking-wider text-white transition-transform hover:scale-105 shadow-[0_0_15px_rgba(224,90,51,0.4)]">
+          Get a Quote
+        </Link>
       </div>
-      {isOpen && (
-        <div className="md:hidden bg-black/90 p-4 flex flex-col gap-4 border-b border-white/10">
-          {["Services", "Demos", "About", "Contact"].map((item) => (
-            <Link key={item} href={`/${item.toLowerCase()}`} className="text-sm font-bold uppercase tracking-widest text-gray-300" onClick={() => setIsOpen(false)}>{item}</Link>
-          ))}
-          <Link href="/quote" className="bg-[#E05A33] text-center px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white rounded" onClick={() => setIsOpen(false)}>Get a Consultation</Link>
-        </div>
-      )}
-    </header>
+    </motion.div>
   );
 }
