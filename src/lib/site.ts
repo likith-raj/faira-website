@@ -38,8 +38,14 @@ export const SERVICES = [
   {
     id: "automation",
     title: "Automation & AI Integration",
-    desc: "WhatsApp automation, AI chatbots, auto-replies and report automation for your business.",
+    desc: "WhatsApp automation, auto-replies and report automation for your business.",
     icon: "Sparkles"
+  },
+  {
+    id: "chatbot",
+    title: "AI Chatbot for Shops",
+    desc: "24/7 AI assistants to answer FAQs, take enquiries, and show products.",
+    icon: "MessageSquare"
   }
 ];
 
@@ -99,6 +105,14 @@ export const DEMOS = [
     desc: "Interactive phone mockup with 5 switchable app screens.",
     image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&q=80",
     accent: "#E05A33"
+  },
+  {
+    slug: "chatbot",
+    title: "SuperMart AI",
+    type: "AI Chatbot Demo",
+    desc: "Floating AI assistant that answers FAQs and collects leads 24/7.",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1200&q=80",
+    accent: "#E05A33"
   }
 ];
 
@@ -107,7 +121,8 @@ export const PRICING = [
   { name: "Extended Website", price: "Starting at ₹1,500", desc: "10+ pages, CMS/blogs, booking pages, advanced SEO." },
   { name: "Booking / Lead System", price: "Starting at ₹1,500", desc: "Online booking, lead forms, admin panel to manage enquiries." },
   { name: "Custom Web App", price: "Starting at ₹1,500", desc: "Dashboards, portals, CRM-lite, inventory and reporting systems." },
-  { name: "Mobile App", price: "Starting at ₹1,500", desc: "Android + iOS apps built with React Native / Flutter." }
+  { name: "Mobile App", price: "Starting at ₹1,500", desc: "Android + iOS apps built with React Native / Flutter." },
+  { name: "AI Chatbot", price: "Starting at ₹1,500", desc: "24/7 chatbot to answer questions and collect leads." }
 ];
 
 export const PROCESS = [

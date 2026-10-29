@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-white/10 bg-black/30 py-12 backdrop-blur-xl mt-auto">
+    <footer className="w-full border-t border-white/10 bg-black/50 py-12 backdrop-blur-md mt-auto">
       <div className="mx-auto flex max-w-[95%] flex-col items-center justify-between gap-6 px-4 md:flex-row md:px-12">
         <div className="flex flex-col items-center gap-2 md:items-start">
           <span className="font-display text-2xl font-black uppercase tracking-tighter text-white">FAIRA</span>
