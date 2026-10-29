@@ -1,57 +1,35 @@
 "use client";
 
 import { useState } from "react";
+import { SITE } from "@/lib/site";
 import { Send } from "lucide-react";
-import { saveEnquiry } from "@/lib/enquiries";
-import { isValidEmail, isValidPhone } from "@/lib/utils";
-import { GradientButton } from "./ui";
-import { useToast } from "./toast";
 
-export default function ContactForm() {
-  const { toast } = useToast();
-  const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ business_name: "", contact_name: "", phone: "", email: "", city: "Nellore", message: "" });
+export function ContactForm() {
+  const [formData, setFormData] = useState({ name: "", phone: "", message: "" });
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  async function onSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.business_name.trim() || !form.contact_name.trim() || !form.message.trim()) {
-      toast("Please fill business name, your name and message.");
-      return;
-    }
-    if (!isValidPhone(form.phone) && !isValidEmail(form.email)) {
-      toast("Please provide a valid phone (+91) or email so we can reply.");
-      return;
-    }
-    setBusy(true);
-    await saveEnquiry({
-      ...form,
-      business_type: "Other",
-      service_needed: ["unsure"],
-      budget_range: "Not discussed",
-      timeline: "Just exploring",
-      source: "contact-page"
-    });
-    setBusy(false);
-    setForm({ business_name: "", contact_name: "", phone: "", email: "", city: "Nellore", message: "" });
-    toast("✓ Enquiry sent! We'll contact you within 24 hours.");
-  }
+    const text = `Hi FAIRA, I have a message.%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Message:* ${formData.message}`;
+    window.open(`https://wa.me/${SITE.whatsapp}?text=${text}`, "_blank");
+  };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <input className="input" placeholder="Business name *" value={form.business_name} onChange={set("business_name")} />
-        <input className="input" placeholder="Your name *" value={form.contact_name} onChange={set("contact_name")} />
-        <input className="input" placeholder="Phone (+91)" value={form.phone} onChange={set("phone")} inputMode="tel" />
-        <input className="input" placeholder="Email" type="email" value={form.email} onChange={set("email")} />
+    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-lg mx-auto bg-zinc-900/50 p-8 rounded-3xl border border-zinc-800 backdrop-blur-xl">
+      <div>
+        <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 ml-2">Your Name</label>
+        <input required placeholder="e.g. Sunny" className="w-full mt-2 bg-black/50 border border-zinc-800 p-4 rounded-xl text-white focus:outline-none focus:border-[#E05A33]" onChange={(e) => setFormData({...formData, name: e.target.value})} />
       </div>
-      <input className="input" placeholder="City" value={form.city} onChange={set("city")} />
-      <textarea className="input min-h-32 resize-y" placeholder="What do you need? (website, booking system, app…)" value={form.message} onChange={set("message")} />
-      <GradientButton type="submit" disabled={busy} className="w-full sm:w-auto">
-        <Send className="h-4 w-4" /> {busy ? "Sending…" : "Send enquiry"}
-      </GradientButton>
+      <div>
+        <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 ml-2">Phone Number</label>
+        <input required placeholder="+91 9876543210" className="w-full mt-2 bg-black/50 border border-zinc-800 p-4 rounded-xl text-white focus:outline-none focus:border-[#E05A33]" onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+      </div>
+      <div>
+        <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 ml-2">Message</label>
+        <textarea required placeholder="How can we help?" rows={4} className="w-full mt-2 bg-black/50 border border-zinc-800 p-4 rounded-xl text-white focus:outline-none focus:border-[#E05A33]" onChange={(e) => setFormData({...formData, message: e.target.value})} />
+      </div>
+      <button type="submit" className="w-full bg-[#E05A33] text-white font-bold uppercase tracking-widest py-4 rounded-xl mt-4 hover:bg-[#C94A25] transition flex justify-center items-center gap-2">
+        <Send size={18} /> Send via WhatsApp
+      </button>
     </form>
   );
 }

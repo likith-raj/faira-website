@@ -2,11 +2,19 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "plus.unsplash.com" },
-      { protocol: "https", hostname: "q7.ai.imagine.qoder.com" }
-    ]
-  }
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.(png|jpe?g|gif|svg|webp)$/i,
+      type: 'asset/resource',
+    });
+    return config;
+  },
 };
 
 export default nextConfig;
