@@ -1,18 +1,27 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { motion, useScroll, useTransform } from "framer-motion";
+
+const TowerScene = dynamic(() => import("./JapaneseTowerScene"), { ssr: false });
+
 export function NightBackdrop() {
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "-6%"]);
+
   return (
-    <div className="fixed inset-0 z-[-1] w-full h-full overflow-hidden bg-[#0A0A0A]">
-      {/* Animated Gradient Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#E05A33] opacity-20 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#7C3AED] opacity-20 blur-[150px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-      <div className="absolute top-[40%] left-[50%] w-[30%] h-[30%] rounded-full bg-[#3B82F6] opacity-10 blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
-      
-      {/* Grid Pattern overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-      
-      {/* Soft vignette */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+    <div className="fixed inset-0 z-[-1] overflow-hidden" aria-hidden>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        style={{ y, filter: "brightness(1.15) saturate(1.1)" }}
+        className="absolute inset-x-0 -top-[5%] h-[110%]"
+      >
+        <TowerScene />
+      </motion.div>
+      <div className="pointer-events-none absolute inset-0 bg-black/30" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
     </div>
   );
 }

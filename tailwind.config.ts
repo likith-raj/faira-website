@@ -32,8 +32,9 @@ const config: Config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#E05A33",
+          deep: "#C94A25",
+          foreground: "#FFFFFF",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -43,6 +44,25 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        /* FAIRA brand palette */
+        bg: { DEFAULT: "#0A0A0A", 2: "#12100E" },
+        panel: "#161210",
+        soft: "#241511",
+        ink: { DEFAULT: "#F9F8F6", dim: "#B9B2AA", faint: "#8A837C" },
+        violet: "#A8471F",
+        mint: "#34D399",
+        amber: "#FBBF24",
+        coral: "#FB923C",
+        rose: "#F87171",
+        sky: "#F59E0B",
+      },
+      fontFamily: {
+        display: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        body: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+      },
+      boxShadow: {
+        glow: "0 0 30px rgba(224, 90, 51, 0.35)",
       },
       borderRadius: {
         lg: "var(--radius)",

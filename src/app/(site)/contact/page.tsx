@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
-import ContactForm from "@/components/ContactForm";
+import { ContactForm } from "@/components/ContactForm";
 import { GlassCard, Reveal, SectionWrapper } from "@/components/ui";
 import { SITE } from "@/lib/site";
 
