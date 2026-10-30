@@ -46,13 +46,13 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-[95%] flex flex-col items-center rounded-3xl border border-white/10 bg-black/55 px-6 py-14 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
+          className="w-full max-w-[95%] flex flex-col items-center rounded-3xl border border-white/10 bg-black/25 px-6 py-12 backdrop-blur-md shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-8 backdrop-blur-md">
             <span className="h-2 w-2 rounded-full bg-[#E05A33] animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-widest text-zinc-300">Nellore - Andhra Pradesh</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-light uppercase tracking-widest leading-[1.25] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.55)]">
+          <h1 className="text-3xl md:text-5xl font-light uppercase tracking-widest leading-[1.3] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.55)]">
             Your Local Business. <br />
             <span className="text-[#E05A33]">Built for the Digital World.</span>
           </h1>
@@ -106,7 +106,7 @@ export default function HomePage() {
 
       <section className="py-24 px-6 text-center w-full max-w-[95%] mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: "easeOut" }}>
-          <h2 className="text-4xl md:text-6xl font-light uppercase tracking-widest mb-10 text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.5)]">Ready to start?</h2>
+          <h2 className="text-3xl md:text-5xl font-light uppercase tracking-widest mb-10 text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.5)]">Ready to start?</h2>
           <Link href="/quote" className="inline-flex items-center gap-3 bg-white text-black px-12 py-6 text-sm font-bold uppercase tracking-widest rounded-full hover:bg-zinc-200 transition-all duration-300 hover:scale-[1.02]">
             Get a Free Quote <ArrowRight size={18} />
           </Link>

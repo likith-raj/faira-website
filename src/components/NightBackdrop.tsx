@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-const TowerScene = dynamic(() => import("./JapaneseTowerScene"), { ssr: false });
+const FlowScene = dynamic(() => import("./StructureFlowScene"), { ssr: false });
 
 export function NightBackdrop() {
   const { scrollYProgress } = useScroll();
@@ -15,13 +15,12 @@ export function NightBackdrop() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        style={{ y, filter: "brightness(1.15) saturate(1.1)" }}
+        style={{ y }}
         className="absolute inset-x-0 -top-[5%] h-[110%]"
       >
-        <TowerScene />
+        <FlowScene />
       </motion.div>
-      <div className="pointer-events-none absolute inset-0 bg-black/30" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent via-transparent to-black/20" />
     </div>
   );
 }

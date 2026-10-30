@@ -120,6 +120,26 @@ body {
   cursor: text;
 }
 
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 9999px;
+  background: #e05a33;
+  box-shadow: 0 0 10px rgba(224, 90, 51, 0.7);
+  pointer-events: none;
+  z-index: 100;
+  will-change: transform;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cursor-dot--active {
+  background: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
+}
+
 @layer components {
   .glass {
     background: rgba(10, 10, 10, 0.45);
