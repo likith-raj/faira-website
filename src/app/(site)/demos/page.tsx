@@ -1,62 +1,53 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { GlassCard, Reveal, SectionWrapper } from "@/components/ui";
-import { DEMOS } from "@/lib/site";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Demos",
-  description: "Seven fully-designed demo websites and apps by FAIRA — restaurant, clinic, real estate, coaching, retail, custom web app and mobile app."
-};
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, Bot, Mic, Zap } from "lucide-react";
 
 export default function DemosPage() {
-  return (
-    <SectionWrapper
-      eyebrow="Demo gallery"
-      title="Real designs. Real features. See them live."
-      subtitle="Every demo below is a complete, working design built by FAIRA — click through to explore. Sample businesses and prices are illustrative."
-    >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DEMOS.map((d, i) => (
-          <Reveal key={d.slug} delay={i * 0.06}>
-            <Link href={`/demos/${d.slug}`} className="block focus-ring rounded-[14px]">
-              <GlassCard hover className="group h-full overflow-hidden !p-0">
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={d.image}
-                    alt={`${d.title} — ${d.type} demo by FAIRA`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width:768px) 100vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/90 to-transparent" />
-                  <span
-                    className="absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-bold text-white"
-                    style={{ background: d.accent }}
-                  >
-                    {d.type}
-                  </span>
-                </div>
-                <div className="p-5">
-                  <h2 className="font-display text-lg font-bold">{d.title}</h2>
-                  <p className="mt-1.5 text-sm text-ink-dim">{d.desc}</p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
-                    View Demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </GlassCard>
-            </Link>
-          </Reveal>
-        ))}
-      </div>
+  const demos = [
+    {
+      slug: "/demos/chatbot",
+      title: "FAIRA AI Chat Assistant",
+      desc: "Live AI chatbot that answers customer questions about our services, pricing, and voice agents.",
+      icon: Bot,
+    },
+  ];
 
-      <Reveal className="mt-12 text-center text-sm text-ink-faint">
-        Like something? Mix and match — we build custom versions for your business.{" "}
-        <Link href="/quote" className="text-accent hover:underline">
-          Get a quote →
-        </Link>
-      </Reveal>
-    </SectionWrapper>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-32">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl w-full text-center"
+      >
+        <h1 className="text-4xl md:text-6xl font-light uppercase tracking-widest mb-6 text-white">
+          Live AI Demos
+        </h1>
+        <p className="text-lg text-zinc-400 mb-12">
+          Talk to our AI Chat Agent and see how it answers real business questions.
+        </p>
+
+        <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
+          {demos.map((demo) => (
+            <Link
+              key={demo.slug}
+              href={demo.slug}
+              className="group block p-10 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl hover:border-[#E05A33]/50 hover:bg-black/60 transition-all duration-500 text-left"
+            >
+              <demo.icon className="h-10 w-10 text-[#E05A33] mb-6" />
+              <h2 className="text-2xl font-light uppercase tracking-widest text-white mb-2">
+                {demo.title}
+              </h2>
+              <p className="text-zinc-400 mb-4">{demo.desc}</p>
+              <span className="text-[#E05A33] font-bold uppercase tracking-wider flex items-center gap-2">
+                Try the Demo <ArrowRight size={16} />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 }
