@@ -10,10 +10,21 @@ export const dynamic = "force-dynamic";
  * app changes its endpoint — the {no} token is replaced with the train number.
  */
 const HOST = () => (process.env.RAPIDAPI_HOST ?? "indian-railway-irctc.p.rapidapi.com").trim();
-const REQUEST_URL = (no: string) =>
-  (process.env.RAPIDAPI_TRAIN_URL ?? `https://${HOST()}/api/v1/liveTrainStatus?trainNo={no}&startDay=0`)
-    .trim()
-    .replace("{no}", no);
+
+const REQUEST_URL = (no: string) => {
+  // Get today's date in YYYYMMDD format (RapidAPI requires this)
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
+  
+  // Default URL (if you don't have a custom one in .env.local)
+  const defaultUrl = `https://${HOST()}/api/trains/v1/train/status?train_number={no}&departure_date=${dateStr}&isH5=true&client=web`;
+  
+  // Use the environment variable if you have it, otherwise use the default
+  const baseUrl = (process.env.RAPIDAPI_TRAIN_URL ?? defaultUrl).trim();
+  
+  // Replace {no} with the train number
+  return baseUrl.replace("{no}", no);
+};
 
 function trainNumber(raw: string | null): string | null {
   const match = String(raw ?? "").match(/\d{4,6}/);
@@ -29,6 +40,7 @@ function pick(data: any, keys: string[]): any {
 }
 
 function toStatus(no: string, json: any) {
+  // These paths are guesses based on common API responses. You may need to adjust them.
   const name = pick(json, [
     "data.train_name",
     "data.trainName",

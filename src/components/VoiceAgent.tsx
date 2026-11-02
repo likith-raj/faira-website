@@ -2,80 +2,17 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Mic, Square, Trash2, Volume2 } from "lucide-react";
-import { askFairaAi, getFairaAiStatus, type AiTurn } from "@/lib/ai";
+import { askFairaAi, type AiTurn } from "@/lib/ai";
 
 type VoiceId = "nova" | "atlas" | "aria";
 
-type VoiceProfile = {
-  label: string;
-  hint: string;
-  pitch: number;
-  rate: number;
-  /** Name fragments of the studio-quality voices each persona should grab first. */
-  prefer: RegExp;
-  sample: string;
-};
-
-const VOICES: Record<VoiceId, VoiceProfile> = {
-  nova: {
-    label: "Nova",
-    hint: "Warm · professional",
-    pitch: 1.1,
-    rate: 0.95,
-    prefer: /female|zira|susan|heera|veena|salli|joanna|amber|aria|jenny/i,
-    sample: "Nova here. I answer customer calls for FAIRA, around the clock."
-  },
-  atlas: {
-    label: "Atlas",
-    hint: "Deep · authoritative",
-    pitch: 0.8,
-    rate: 0.9,
-    prefer: /male|ravi|david|mark|prabhat|matthew|fred|guy|liam/i,
-    sample: "Atlas speaking. FAIRA builds AI agents that never miss a lead."
-  },
-  aria: {
-    label: "Aria",
-    hint: "Friendly · fast",
-    pitch: 1.2,
-    rate: 1.05,
-    prefer: /female|samantha|karen|neerja|kalpana|victoria|catherine|swara|sonia/i,
-    sample: "Hi, I am Aria! Ask me anything about our AI voice and chat agents."
-  }
+const VOICES: Record<VoiceId, { label: string; hint: string; pitch: number; rate: number; sample: string }> = {
+  nova: { label: "Nova", hint: "Warm · professional", pitch: 1.1, rate: 0.95, sample: "Nova here. I answer customer calls for FAIRA, around the clock." },
+  atlas: { label: "Atlas", hint: "Deep · authoritative", pitch: 0.8, rate: 0.9, sample: "Atlas speaking. FAIRA builds AI agents that never miss a lead." },
+  aria: { label: "Aria", hint: "Friendly · fast", pitch: 1.2, rate: 1.05, sample: "Hi, I am Aria! Ask me anything about our AI voice and chat agents." },
 };
 
 const VOICE_IDS = Object.keys(VOICES) as VoiceId[];
-
-/** Higher = better fit for this persona. Neural/"Online" voices always beat plain ones. */
-function scoreVoice(v: SpeechSynthesisVoice, id: VoiceId): number {
-  const tag = `${v.name} ${v.voiceURI}`;
-  let score = 0;
-  if (/natural|neural|online|premium|enhanced/i.test(tag)) score += 40;
-  else if (/google/i.test(tag)) score += 25;
-  const lang = (v.lang || "").toLowerCase();
-  if (lang.startsWith("en-in")) score += 20;
-  else if (lang.startsWith("en")) score += 12;
-  if (VOICES[id].prefer.test(tag.toLowerCase())) score += 15;
-  return score;
-}
-
-/** Give each persona its own real system voice so the three sound different. */
-function assignVoices(all: SpeechSynthesisVoice[]): Record<VoiceId, SpeechSynthesisVoice | null> {
-  const taken = new Set<string>();
-  const out = {} as Record<VoiceId, SpeechSynthesisVoice | null>;
-  for (const id of VOICE_IDS) {
-    const best =
-      all
-        .filter((v) => !taken.has(`${v.voiceURI}|${v.lang}`))
-        .sort((a, b) => scoreVoice(b, id) - scoreVoice(a, id))[0] ?? null;
-    if (best) taken.add(`${best.voiceURI}|${best.lang}`);
-    out[id] = best;
-  }
-  return out;
-}
-
-function isNeural(v: SpeechSynthesisVoice | null): boolean {
-  return Boolean(v && /natural|neural|online|premium|google/i.test(`${v.name} ${v.voiceURI}`));
-}
 
 export function VoiceAgent({ compact = false }: { compact?: boolean }) {
   const [voiceId, setVoiceId] = useState<VoiceId>("nova");
@@ -84,8 +21,6 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
   const [speaking, setSpeaking] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [brain, setBrain] = useState<{ configured: boolean; model: string | null } | null>(null);
-  const [systemVoices, setSystemVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [typed, setTyped] = useState("");
   const [typing, setTyping] = useState<{ index: number; shown: string } | null>(null);
 
@@ -98,32 +33,25 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
   const transcriptRef = useRef<HTMLDivElement | null>(null);
 
   const supported = useMemo(
-    () => Boolean(
-      typeof window !== "undefined" &&
-        ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
-    ),
+    () => Boolean(typeof window !== "undefined" && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)),
     []
   );
 
-  const assigned = useMemo(() => assignVoices(systemVoices), [systemVoices]);
-
-  const speak = useCallback(
-    (text: string, id: VoiceId = voiceRef.current) => {
-      if (typeof window === "undefined" || !window.speechSynthesis || !text) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      const systemVoice = assignVoices(window.speechSynthesis.getVoices())[id];
-      if (systemVoice) utterance.voice = systemVoice;
-      utterance.pitch = VOICES[id].pitch;
-      utterance.rate = VOICES[id].rate;
-      utterance.lang = systemVoice?.lang || "en-IN";
-      utterance.onstart = () => setSpeaking(true);
-      utterance.onend = () => setSpeaking(false);
-      utterance.onerror = () => setSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-    },
-    []
-  );
+  const speak = useCallback((text: string, id: VoiceId = voiceRef.current) => {
+    if (typeof window === "undefined" || !window.speechSynthesis || !text) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find((v) => v.lang.startsWith("en-IN")) || voices.find((v) => v.lang.startsWith("en"));
+    if (preferred) utterance.voice = preferred;
+    utterance.pitch = VOICES[id].pitch;
+    utterance.rate = VOICES[id].rate;
+    utterance.lang = preferred?.lang || "en-IN";
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }, []);
 
   const stopTyping = useCallback(() => {
     if (streamTimerRef.current !== null) {
@@ -133,38 +61,25 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     setTyping(null);
   }, []);
 
-  /** Reveal the reply character-by-character while the same text is spoken aloud. */
-  const typeOut = useCallback(
-    (index: number, text: string) => {
-      if (streamTimerRef.current !== null) clearInterval(streamTimerRef.current);
-      setTyping({ index, shown: "" });
-      let shown = 0;
-      streamTimerRef.current = setInterval(() => {
-        shown = Math.min(shown + 2, text.length);
-        if (shown >= text.length) {
-          if (streamTimerRef.current !== null) {
-            clearInterval(streamTimerRef.current);
-            streamTimerRef.current = null;
-          }
-          setTyping(null);
-          return;
+  const typeOut = useCallback((index: number, text: string) => {
+    if (streamTimerRef.current !== null) clearInterval(streamTimerRef.current);
+    setTyping({ index, shown: "" });
+    let shown = 0;
+    streamTimerRef.current = setInterval(() => {
+      shown = Math.min(shown + 2, text.length);
+      if (shown >= text.length) {
+        if (streamTimerRef.current !== null) {
+          clearInterval(streamTimerRef.current);
+          streamTimerRef.current = null;
         }
-        setTyping({ index, shown: text.slice(0, shown) });
-      }, 24);
-    },
-    []
-  );
+        setTyping(null);
+        return;
+      }
+      setTyping({ index, shown: text.slice(0, shown) });
+    }, 24);
+  }, []);
 
   useEffect(() => stopTyping, [stopTyping]);
-
-  useEffect(() => {
-    getFairaAiStatus().then(setBrain);
-    if (typeof window === "undefined" || !window.speechSynthesis) return undefined;
-    const load = () => setSystemVoices(window.speechSynthesis.getVoices());
-    load();
-    window.speechSynthesis.addEventListener("voiceschanged", load);
-    return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
-  }, []);
 
   const answer = useCallback(
     async (userText: string) => {
@@ -267,29 +182,12 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [turns, typing, thinking]);
 
-  const activeVoice = assigned[voiceId];
-  const engineLabel =
-    brain === null
-      ? "Checking AI brain…"
-      : brain.configured
-        ? `AI brain: Google Gemini · ${brain.model ?? "model pending"}`
-        : "AI brain not connected — add GEMINI_API_KEY";
-  const voiceLabel = activeVoice
-    ? `Voice engine: ${activeVoice.name}${isNeural(activeVoice) ? " (neural)" : " (browser default)"}`
-    : "Voice engine: no browser voices loaded";
-
   return (
-    <div
-      className={`w-full rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.45)] ${
-        compact ? "p-5 md:p-6" : "p-6 md:p-10"
-      }`}
-    >
+    <div className={`w-full rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.45)] ${compact ? "p-5 md:p-6" : "p-6 md:p-10"}`}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#E05A33]">Live AI Voice Demo</p>
-          <h3 className={`font-light uppercase tracking-widest text-white ${compact ? "text-lg" : "text-2xl"}`}>
-            Talk to FAIRA
-          </h3>
+          <h3 className={`font-light uppercase tracking-widest text-white ${compact ? "text-lg" : "text-2xl"}`}>Talk to FAIRA</h3>
         </div>
         <div className="flex gap-2">
           {VOICE_IDS.map((id) => {
@@ -307,9 +205,7 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
                 }`}
               >
                 {VOICES[id].label}
-                <span className="ml-2 text-[9px] font-medium normal-case tracking-normal text-zinc-500">
-                  {VOICES[id].hint}
-                </span>
+                <span className="ml-2 text-[9px] font-medium normal-case tracking-normal text-zinc-500">{VOICES[id].hint}</span>
               </button>
             );
           })}
@@ -317,13 +213,12 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
       </div>
 
       <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-500">
-        {engineLabel} · {voiceLabel}
+        AI brain: Google Gemini · gemini-1.5-flash · Voice engine: browser default
       </p>
 
       {!supported && (
         <p className="mt-5 rounded-2xl border border-amber/30 bg-amber/10 px-4 py-3 text-sm text-amber">
-          Your browser does not support voice recognition. Please use Google Chrome or Microsoft Edge —
-          or type your question below and the AI will still answer out loud.
+          Your browser does not support voice recognition. Please use Google Chrome or Microsoft Edge — or type your question below.
         </p>
       )}
 
@@ -354,24 +249,12 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
           )}
           {speaking && !listening && !thinking && (
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E05A33]">
-              <Volume2 size={14} />
-              <span className="flex items-end gap-[3px]">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <span
-                    key={i}
-                    className="w-[3px] origin-bottom animate-voice-bar rounded-full bg-[#E05A33]"
-                    style={{ height: 14, animationDelay: `${i * 90}ms` }}
-                  />
-                ))}
-              </span>
-              {VOICES[voiceId].label} is speaking…
+              <Volume2 size={14} /> {VOICES[voiceId].label} is speaking…
             </p>
           )}
           {!listening && !speaking && !thinking && (
             <p className="text-sm text-zinc-400">
-              {turns.length
-                ? `Speaking as ${VOICES[voiceId].label}. Ask about our voice agents, chat agents or automation.`
-                : "Tap the mic and ask something like “what do your AI agents do?”"}
+              {turns.length ? `Speaking as ${VOICES[voiceId].label}. Ask about our services.` : "Tap the mic and ask something like “what do your AI agents do?”"}
             </p>
           )}
           {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
@@ -383,41 +266,23 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
           value={typed}
           onChange={(e) => setTyped(e.target.value)}
           placeholder="Type a question for the AI…"
-          aria-label="Type a question for the AI"
           className="flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-[#E05A33]/60"
         />
-        <button
-          type="submit"
-          disabled={thinking || !typed.trim()}
-          className="rounded-full bg-[#E05A33] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-[#C94A25] disabled:cursor-not-allowed disabled:opacity-40"
-        >
+        <button type="submit" disabled={thinking || !typed.trim()} className="rounded-full bg-[#E05A33] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-[#C94A25] disabled:opacity-40">
           Ask
         </button>
       </form>
 
       {turns.length > 0 && (
-        <div
-          ref={transcriptRef}
-          className={`mt-5 space-y-3 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4 ${
-            compact ? "max-h-56" : "max-h-80"
-          }`}
-        >
+        <div ref={transcriptRef} className={`mt-5 space-y-3 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4 ${compact ? "max-h-56" : "max-h-80"}`}>
           {turns.map((turn, index) => {
             const streaming = typing?.index === index ? typing.shown : null;
             return (
               <div key={index} className={`flex ${turn.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                    turn.role === "user" ? "bg-zinc-800 text-zinc-100" : "bg-[#E05A33]/90 text-white"
-                  }`}
-                >
-                  <span className="mr-2 text-[10px] font-bold uppercase tracking-widest opacity-70">
-                    {turn.role === "user" ? "You:" : "FAIRA AI:"}
-                  </span>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${turn.role === "user" ? "bg-zinc-800 text-zinc-100" : "bg-[#E05A33]/90 text-white"}`}>
+                  <span className="mr-2 text-[10px] font-bold uppercase tracking-widest opacity-70">{turn.role === "user" ? "You:" : "FAIRA AI:"}</span>
                   {streaming ?? turn.text}
-                  {streaming !== null && (
-                    <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-white/80 align-middle" />
-                  )}
+                  {streaming !== null && <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-white/80 align-middle" />}
                 </div>
               </div>
             );
@@ -425,8 +290,7 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
           {thinking && (
             <div className="flex justify-start">
               <div className="rounded-2xl bg-[#E05A33]/20 px-4 py-2.5 text-sm text-zinc-300">
-                <span className="mr-2 text-[10px] font-bold uppercase tracking-widest opacity-70">FAIRA AI:</span>
-                thinking…
+                <span className="mr-2 text-[10px] font-bold uppercase tracking-widest opacity-70">FAIRA AI:</span> thinking…
               </div>
             </div>
           )}
@@ -435,22 +299,10 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
 
       {turns.length > 0 && (
         <div className="mt-4 flex gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              stopSpeaking();
-              setTurns([]);
-              setError(null);
-            }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-200 transition-all hover:border-[#E05A33]/60 hover:text-[#E05A33]"
-          >
+          <button type="button" onClick={() => { stopSpeaking(); setTurns([]); setError(null); }} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-200 transition-all hover:border-[#E05A33]/60 hover:text-[#E05A33]">
             <Trash2 size={13} /> Clear Conversation
           </button>
-          <button
-            type="button"
-            onClick={stopSpeaking}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-200 transition-all hover:border-[#E05A33]/60 hover:text-[#E05A33]"
-          >
+          <button type="button" onClick={stopSpeaking} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-200 transition-all hover:border-[#E05A33]/60 hover:text-[#E05A33]">
             <Square size={12} /> Stop
           </button>
         </div>
