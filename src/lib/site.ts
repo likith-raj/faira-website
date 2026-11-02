@@ -19,7 +19,7 @@ export const SERVICES = [
   {
     id: "ai-voice",
     title: "AI Voice Agents",
-    desc: "Phone answering, appointment booking, and customer support — using Whisper + Piper TTS.",
+    desc: "Phone answering, appointment booking, and customer support — AI that listens and replies out loud.",
     icon: "Mic"
   },
   {
@@ -34,10 +34,4 @@ export const SERVICES = [
     desc: "Custom workflows, report generation, and CRM integration for your business.",
     icon: "Zap"
   }
-];
-
-export const PRICING = [
-  { name: "AI Chat Agent", price: "₹1,500 setup", desc: "Website chatbot, WhatsApp automation, FAQ answering. + ₹500/month maintenance." },
-  { name: "AI Voice Agent", price: "₹5,000 setup", desc: "Human-like voice calls, appointment booking, customer support. + ₹1,500/month maintenance." },
-  { name: "Custom AI Automation", price: "Quote based", desc: "Tailored workflows, CRM integration, custom reports." }
 ];

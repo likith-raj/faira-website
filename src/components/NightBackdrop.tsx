@@ -20,7 +20,6 @@ export function NightBackdrop() {
       >
         <FlowScene />
       </motion.div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent via-transparent to-black/20" />
     </div>
   );
 }

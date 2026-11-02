@@ -13,15 +13,14 @@ export function QuoteWizard() {
     businessName: "",
     businessType: "",
     service: "",
-    budget: "",
     name: "",
     phone: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `Hi FAIRA, I want a quote.%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Business:* ${formData.businessName}%0A*Type:* ${formData.businessType}%0A*Service:* ${formData.service}%0A*Budget:* ${formData.budget}`;
-    window.open(`https://wa.me/${SITE.whatsapp}?text=${text}`, "_blank");
+    const text = `Hi FAIRA, I want to discuss a project.\n\n*Name:* ${formData.name}\n*Phone:* ${formData.phone}\n*Business:* ${formData.businessName}\n*Type:* ${formData.businessType}\n*Service:* ${formData.service}`;
+    window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
@@ -31,7 +30,7 @@ export function QuoteWizard() {
     >
       <div className="p-8 md:p-12">
         <div className="text-center space-y-3 mb-10">
-          <h2 className="text-3xl md:text-4xl font-light uppercase tracking-widest text-white">Get a Free Quote</h2>
+          <h2 className="text-3xl md:text-4xl font-light uppercase tracking-widest text-white">Tell Us What You Need</h2>
           <p className="text-zinc-400 text-sm tracking-wide">Fill this out and we&apos;ll message you on WhatsApp instantly.</p>
         </div>
 
@@ -61,11 +60,6 @@ export function QuoteWizard() {
           <div className="space-y-2">
             <Label htmlFor="service" className="text-zinc-300 uppercase tracking-widest text-[10px] font-bold ml-2">What do you need?</Label>
             <Input id="service" required placeholder="e.g. Website, AI Chatbot, Mobile App" className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-2xl px-5 py-6 focus-visible:ring-[#E05A33] transition-all" onChange={(e) => setFormData({...formData, service: e.target.value})} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="budget" className="text-zinc-300 uppercase tracking-widest text-[10px] font-bold ml-2">Budget</Label>
-            <Input id="budget" required placeholder="e.g. ?1,500" className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-2xl px-5 py-6 focus-visible:ring-[#E05A33] transition-all" onChange={(e) => setFormData({...formData, budget: e.target.value})} />
           </div>
 
           <Button type="submit" className="w-full bg-[#E05A33] hover:bg-[#C94A25] text-white font-bold uppercase tracking-widest py-7 text-sm rounded-full transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(224,90,51,0.3)] mt-8">

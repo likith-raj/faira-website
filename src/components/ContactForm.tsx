@@ -9,8 +9,8 @@ export function ContactForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `Hi FAIRA, I have a message.%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Message:* ${formData.message}`;
-    window.open(`https://wa.me/${SITE.whatsapp}?text=${text}`, "_blank");
+    const text = `Hi FAIRA, I have a message.\n\n*Name:* ${formData.name}\n*Phone:* ${formData.phone}\n*Message:* ${formData.message}`;
+    window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (

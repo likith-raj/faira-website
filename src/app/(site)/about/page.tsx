@@ -17,7 +17,7 @@ export default function AboutPage() {
           <Reveal>
             <p className="text-lg text-ink">
               FAIRA started with a simple frustration: Nellore business owners were being sold
-              slow, outdated websites at confusing prices — or nothing at all.
+              slow, outdated websites that never worked — or nothing at all.
             </p>
           </Reveal>
           <Reveal delay={0.08}>
@@ -36,7 +36,7 @@ export default function AboutPage() {
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
                 { icon: Target, title: "Mission", desc: "Make every local business in AP look world-class online." },
-                { icon: Heart, title: "Values", desc: "Honest pricing, clear communication, design pride." },
+                { icon: Heart, title: "Values", desc: "Straight talk, clear communication, design pride." },
                 { icon: Rocket, title: "Approach", desc: "Small team, modern stack, fast iterations, real support." },
                 { icon: Users, title: "For you", desc: "Restaurants, clinics, coaches, retailers, agencies and startups." }
               ].map((v) => (
@@ -69,9 +69,9 @@ export default function AboutPage() {
               <p className="mono-label mb-5">Our commitments to you</p>
               <ul className="space-y-4">
                 {[
-                  { t: "Fixed, written quotes", d: "The price we agree is the price you pay. Domain and hosting costs shown upfront at actuals." },
+                  { t: "Everything in writing", d: "Scope, deliverables and timeline confirmed before work starts. Domain and hosting are always set up in your name." },
                   { t: "You see the work as it happens", d: "Progress demos during build, so there are no surprises at launch." },
-                  { t: "Honest timelines", d: "We tell you what is realistically possible in 7 days versus 7 weeks — before you pay." },
+                  { t: "Honest timelines", d: "We tell you what is realistically possible in 7 days versus 7 weeks — before you commit." },
                   { t: "Support after launch", d: "We stay reachable for edits, uptime issues and growth advice." }
                 ].map((c) => (
                   <li key={c.t} className="flex gap-3">
@@ -87,7 +87,7 @@ export default function AboutPage() {
           </Reveal>
           <Reveal delay={0.24}>
             <div className="text-center">
-              <GradientButton href="/quote">Work with us in {SITE.city.split(",")[0]}</GradientButton>
+              <GradientButton href="/contact">Work with us in {SITE.city.split(",")[0]}</GradientButton>
             </div>
           </Reveal>
         </div>

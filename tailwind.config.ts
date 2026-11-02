@@ -64,6 +64,15 @@ const config: Config = {
       boxShadow: {
         glow: "0 0 30px rgba(224, 90, 51, 0.35)",
       },
+      keyframes: {
+        "voice-bar": {
+          "0%, 100%": { transform: "scaleY(0.3)" },
+          "50%": { transform: "scaleY(1)" },
+        },
+      },
+      animation: {
+        "voice-bar": "voice-bar 0.9s ease-in-out infinite",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

@@ -2,15 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, Mic, Zap } from "lucide-react";
+import { ArrowRight, Bot, Mic, TrainFront } from "lucide-react";
 
 export default function DemosPage() {
   const demos = [
     {
       slug: "/demos/chatbot",
       title: "FAIRA AI Chat Assistant",
-      desc: "Live AI chatbot that answers customer questions about our services, pricing, and voice agents.",
+      desc: "Live AI chatbot that answers customer questions about our services and voice agents.",
       icon: Bot,
+    },
+    {
+      slug: "/demos/voice",
+      title: "FAIRA AI Voice Assistant",
+      desc: "Human-like voice agent that listens, understands, and responds in real-time.",
+      icon: Mic,
+    },
+    {
+      slug: "/demos/train-voice",
+      title: "Real Train AI Voice Bot",
+      desc: "Voice agent that pulls live Indian Railways status for any train number and speaks it back.",
+      icon: TrainFront,
     },
   ];
 
@@ -22,14 +34,14 @@ export default function DemosPage() {
         transition={{ duration: 0.8 }}
         className="max-w-4xl w-full text-center"
       >
-        <h1 className="text-4xl md:text-6xl font-light uppercase tracking-widest mb-6 text-white">
+        <h1 className="text-3xl md:text-5xl font-light uppercase tracking-widest mb-6 text-white">
           Live AI Demos
         </h1>
         <p className="text-lg text-zinc-400 mb-12">
-          Talk to our AI Chat Agent and see how it answers real business questions.
+          Talk to our AI Chat and Voice Agents. See how they answer real business questions.
         </p>
 
-        <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {demos.map((demo) => (
             <Link
               key={demo.slug}

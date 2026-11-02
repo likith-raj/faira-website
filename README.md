@@ -13,10 +13,11 @@ The 7 demo sites keep their own light palettes on purpose (they show client vari
 - Next.js 14 (App Router) + TypeScript
 - Tailwind CSS (custom theme tokens in `tailwind.config.ts`)
 - Framer Motion · Lucide React · Recharts
-- ThreeUI `TempleNightScene` (three.js) as the global backdrop — pinned to `three@0.149.0`,
-  imported from the subpath `@designcodeio/threeui/components/TempleNightScene`
+- ThreeUI `StructureFlowCollection` (three.js) as the global backdrop — pinned to `three@0.149.0`,
+  imported from the subpath `@designcodeio/threeui/components/StructureFlowCollection`
   (the barrel import breaks Next 14's webpack build)
 - Supabase (Postgres + Auth) for enquiries & admin — **optional**
+- Google Gemini for the live voice & chat demos — **optional**, needs one env var
 
 ## Runs without Supabase (demo mode)
 
@@ -44,13 +45,75 @@ npm run dev                  # http://localhost:3000
 
 Forms now write to Postgres; without keys they fall back to local mode automatically.
 
+### Turning on the AI voice & chat demos
+
+Both demos are real: the browser transcribes speech (`webkitSpeechRecognition`) and sends
+only the finished text to `/api/chat`, which asks Google Gemini and replies with a natural
+system voice. The key stays on the server — it is never shipped to the browser.
+
+1. Get a free key at https://aistudio.google.com/apikey
+2. Local: put it in `.env.local` as `GEMINI_API_KEY=...` and restart `npm run dev`.
+   Vercel: Project → Settings → Environment Variables → `GEMINI_API_KEY` (then redeploy).
+3. Check it: open `/api/chat` in the browser. It answers
+   `{"configured": true, "model": "gemini-2.5-flash"}`.
+
+Without a key the demos still run but say plainly that the AI brain is not connected.
+`GEMINI_MODEL` can pin a specific model; by default the best flash model the key can see
+is discovered at runtime.
+
+FAIRA never publishes rates. Keep it that way — no price figures anywhere on the main site
+(demo-business sample prices under `/demos/*` are fine).
+
+### Live train data (/demos/train-voice)
+
+`src/app/api/train-status/route.ts` calls the RapidAPI app **Indian Railway IRCTC** with
+`RAPIDAPI_KEY`. The host must be exactly `indian-railway-irctc.p.rapidapi.com` (no "s" in
+"railway") and the endpoint is `/api/v1/liveTrainStatus?trainNo=<no>&startDay=0` — the plural
+host returns HTTP 404 for every call. Override it with `RAPIDAPI_HOST` only if RapidAPI renames
+the app again.
+
+Any failure (missing key, HTTP error, unreadable JSON, network timeout) returns
+`source: "sample"` with a `note` explaining why, and the page shows a "Source: sample data (not
+live)" badge plus an "FAIRA AI (sample):" transcript label. It never passes fake data off as live.
+Test number: 12759 (Charminar Express).
+
+Status check on this machine (2026-11-01): `RAPIDAPI_KEY` is present and RapidAPI accepts it, but
+every path on that host — including `/api/v1/liveTrainStatus` — answers HTTP 404
+`Endpoint does not exist`, so the demo currently falls back to clearly-labelled sample data. That
+means the key is not subscribed to that app, or the app renamed its endpoint. Fix without touching
+code: on rapidapi.com open the app → **Endpoints** → *Live Train Status* → copy the request URL
+(Code → Node.js) into `.env.local` as
+
+```
+RAPIDAPI_TRAIN_URL=https://<host>/<path>?trainNo={no}&startDay=0
+```
+
+then restart. The route replaces `{no}` with the train number.
+
+## What the voice widget does
+
+`src/components/VoiceAgent.tsx` is used on the home hero (compact) and at `/demos/voice`.
+Mic → browser speech recognition → `/api/chat` (Gemini) → the reply is both read aloud by a real
+system voice (Nova / Atlas / Aria, each with its own pitch and rate) and typed out
+character-by-character in the transcript, the same instant. Transcript bubbles are labelled
+"You:" and "FAIRA AI:", it auto-scrolls to the newest line, and **Stop** silences speech and
+typing together while **Clear Conversation** also wipes the chat history.
+
+Every demo page carries a small "FAIRA Demo" chip that links back to `/demos`. On phones the main
+site gets a floating bottom dock (Home / Demos / Voice AI / Contact) because the top navbar links
+are hidden below `md`.
+
 ## Routes
 
 | Route | What |
 | --- | --- |
-| `/` | Home — hero, services, demos preview, process, pricing, testimonials |
+| `/` | Home — hero with the live AI voice demo, services, demo links |
 | `/services` | 4 service sections + FAQ |
-| `/demos` | Gallery of all 7 demos |
+| `/demos` | Gallery of all demos |
+| `/demos/voice` | Live AI voice agent (mic → Gemini → spoken reply) |
+| `/demos/chatbot` | Live AI chat assistant (text → Gemini) |
+| `/demos/train-voice` | Voice agent that reads live Indian Railways status for a train number |
+| `/api/chat` | Server route that calls Gemini (key stays server-side) |
 | `/demos/restaurant` | Spice Route — restaurant site with menu tabs + reservation |
 | `/demos/clinic` | Sunrise Multispeciality Clinic — appointments |
 | `/demos/real-estate` | Nellore Homes & Lands — listings + lead form |

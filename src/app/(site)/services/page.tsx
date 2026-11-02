@@ -30,9 +30,7 @@ const SECTIONS = [
       "E-commerce catalogs with online ordering",
       "Booking / reservation pages"
     ],
-    ideal: "Restaurants, clinics, shops, coaching centres, real-estate agencies.",
-    price: "Starting ₹1,500"
-  },
+    ideal: "Restaurants, clinics, shops, coaching centres, real-estate agencies."  },
   {
     id: "webapp",
     icon: LayoutDashboard,
@@ -46,9 +44,7 @@ const SECTIONS = [
       "CRM-lite for follow-ups and pipeline",
       "Third-party API integrations (payments, SMS, maps)"
     ],
-    ideal: "Growing businesses drowning in spreadsheets and WhatsApp chats.",
-    price: "Starting ₹1,500"
-  },
+    ideal: "Growing businesses drowning in spreadsheets and WhatsApp chats."  },
   {
     id: "mobileapp",
     icon: Smartphone,
@@ -61,9 +57,7 @@ const SECTIONS = [
       "One codebase — React Native / Flutter",
       "Play Store & App Store publishing support"
     ],
-    ideal: "Businesses ready to go mobile with an existing customer base.",
-    price: "Starting ₹1,500"
-  },
+    ideal: "Businesses ready to go mobile with an existing customer base."  },
   {
     id: "automation",
     icon: Sparkles,
@@ -76,9 +70,7 @@ const SECTIONS = [
       "Report automation (daily/weekly summaries)",
       "AI content tools for menus, posts and offers"
     ],
-    ideal: "Any business losing leads because replies come too late.",
-    price: "Starting ₹1,500"
-  }
+    ideal: "Any business losing leads because replies come too late."  }
 ];
 
 const FAQS = [
@@ -88,7 +80,7 @@ const FAQS = [
   },
   {
     q: "Do you handle domain and hosting?",
-    a: "Yes — we buy and configure domain + hosting in your name and explain the exact yearly cost upfront. It is billed separately at actuals."
+    a: "Yes — we buy and configure domain + hosting in your name, and we explain exactly what you are paying for before anything is bought."
   },
   {
     q: "Can you build just a mobile app?",
@@ -96,7 +88,7 @@ const FAQS = [
   },
   {
     q: "What about after-launch changes?",
-    a: "Every project includes a support period. After that, small edits and maintenance plans are available at simple monthly pricing."
+    a: "Every project includes a support period. After that, small edits and ongoing maintenance are available on a simple monthly plan — we talk it through on a call."
   },
   {
     q: "Do you work with businesses outside Nellore?",
@@ -140,18 +132,12 @@ export default function ServicesPage() {
                     <h2 className="mt-4 font-display text-2xl font-bold md:text-3xl">{s.title}</h2>
                     <p className="mt-2 text-ink-dim">{s.tagline}</p>
 
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                      <div className="rounded-xl border border-[color:var(--border)] bg-[#FAF9F7] p-4">
-                        <p className="mono-label mb-2">Ideal for</p>
-                        <p className="text-sm text-ink-dim">{s.ideal}</p>
-                      </div>
-                      <div className="rounded-xl border border-[color:var(--border)] bg-[#FAF9F7] p-4">
-                        <p className="mono-label mb-2">Pricing</p>
-                        <p className="text-sm font-semibold text-mint">{s.price}</p>
-                      </div>
+                    <div className="mt-6 rounded-xl border border-[color:var(--border)] bg-[#FAF9F7] p-4">
+                      <p className="mono-label mb-2">Ideal for</p>
+                      <p className="text-sm text-ink-dim">{s.ideal}</p>
                     </div>
 
-                    <GradientButton href="/quote" className="mt-7">
+                    <GradientButton href="/contact" className="mt-7">
                       Discuss this service <ArrowRight className="h-4 w-4" />
                     </GradientButton>
                   </div>

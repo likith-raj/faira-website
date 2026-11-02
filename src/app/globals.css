@@ -120,6 +120,29 @@ body {
   cursor: text;
 }
 
+@keyframes cursor-cycle {
+  0%, 100% {
+    background: #e05a33;
+    box-shadow: 0 0 10px rgba(224, 90, 51, 0.75);
+  }
+  20% {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.75);
+  }
+  40% {
+    background: #fb923c;
+    box-shadow: 0 0 10px rgba(251, 146, 60, 0.75);
+  }
+  60% {
+    background: #34d399;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.7);
+  }
+  80% {
+    background: #f87171;
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.7);
+  }
+}
+
 .cursor-dot {
   position: fixed;
   left: 0;
@@ -133,11 +156,13 @@ body {
   pointer-events: none;
   z-index: 100;
   will-change: transform;
+  animation: cursor-cycle 12s ease-in-out infinite;
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .cursor-dot--active {
+  animation: none;
   background: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
 }
 
 @layer components {

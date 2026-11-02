@@ -17,17 +17,20 @@ export function Navbar() {
         </Link>
         <nav className="hidden md:flex items-center gap-10">
           {["Home", "Services", "Demos", "Contact"].map((item) => (
-            <Link 
-              key={item} 
-              href={item === "Home" ? "/" : item === "Demos" ? "/demos/chatbot" : `/${item.toLowerCase()}`} 
-              className="text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-[#E05A33] transition-colors"
+            <Link
+              key={item}
+              href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+              className="text-xs font-bold uppercase tracking-widest text-zinc-300 transition-all hover:text-[#E05A33] hover:drop-shadow-[0_0_10px_rgba(224,90,51,0.55)]"
             >
               {item}
             </Link>
           ))}
         </nav>
-        <Link href="/quote" className="rounded-full bg-[#E05A33] px-6 py-2.5 text-xs font-black uppercase tracking-widest text-white transition-all hover:scale-105 shadow-[0_0_15px_rgba(224,90,51,0.3)]">
-          Get a Quote
+        <Link
+          href="/demos/voice"
+          className="rounded-full bg-[#E05A33] px-6 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_0_15px_rgba(224,90,51,0.3)] transition-all hover:scale-105 hover:bg-[#C94A25] hover:shadow-[0_0_26px_rgba(224,90,51,0.55)]"
+        >
+          Talk to AI
         </Link>
       </div>
     </motion.header>

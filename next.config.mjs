@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // A `next build` here would overwrite the running dev server's .next and break it.
+  // Set NEXT_DIST_DIR (e.g. .next-prod) to build/serve without touching it.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     remotePatterns: [
       {
