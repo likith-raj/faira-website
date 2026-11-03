@@ -2,20 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Mic, Square, Trash2, Volume2 } from "lucide-react";
-import { askFairaAi, type AiTurn } from "@/lib/ai";
-
-type VoiceId = "nova" | "atlas" | "aria";
-
-const VOICES: Record<VoiceId, { label: string; hint: string; pitch: number; rate: number; sample: string }> = {
-  nova: { label: "Nova", hint: "Warm · professional", pitch: 1.1, rate: 0.95, sample: "Nova here. I answer customer calls for FAIRA, around the clock." },
-  atlas: { label: "Atlas", hint: "Deep · authoritative", pitch: 0.8, rate: 0.9, sample: "Atlas speaking. FAIRA builds AI agents that never miss a lead." },
-  aria: { label: "Aria", hint: "Friendly · fast", pitch: 1.2, rate: 1.05, sample: "Hi, I am Aria! Ask me anything about our AI voice and chat agents." },
-};
-
-const VOICE_IDS = Object.keys(VOICES) as VoiceId[];
+import { askFairaAi, getFairaAiStatus, type AiTurn } from "@/lib/ai";
 
 export function VoiceAgent({ compact = false }: { compact?: boolean }) {
-  const [voiceId, setVoiceId] = useState<VoiceId>("nova");
   const [turns, setTurns] = useState<AiTurn[]>([]);
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -23,29 +12,31 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [typed, setTyped] = useState("");
   const [typing, setTyping] = useState<{ index: number; shown: string } | null>(null);
+  const [brain, setBrain] = useState<{ configured: boolean; model: string | null } | null>(null);
 
   const recognitionRef = useRef<any>(null);
-  const voiceRef = useRef<VoiceId>(voiceId);
-  voiceRef.current = voiceId;
   const turnsRef = useRef<AiTurn[]>(turns);
   turnsRef.current = turns;
   const streamTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const transcriptRef = useRef<HTMLDivElement | null>(null);
+  /** Bumped by Stop/Clear so an answer that is still in flight can never start speaking. */
+  const generationRef = useRef(0);
+  const busyRef = useRef(false);
 
   const supported = useMemo(
     () => Boolean(typeof window !== "undefined" && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)),
     []
   );
 
-  const speak = useCallback((text: string, id: VoiceId = voiceRef.current) => {
+  const speak = useCallback((text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis || !text) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find((v) => v.lang.startsWith("en-IN")) || voices.find((v) => v.lang.startsWith("en"));
     if (preferred) utterance.voice = preferred;
-    utterance.pitch = VOICES[id].pitch;
-    utterance.rate = VOICES[id].rate;
+    utterance.pitch = 1.0;
+    utterance.rate = 1.0;
     utterance.lang = preferred?.lang || "en-IN";
     utterance.onstart = () => setSpeaking(true);
     utterance.onend = () => setSpeaking(false);
@@ -83,11 +74,18 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
 
   const answer = useCallback(
     async (userText: string) => {
+      if (busyRef.current) return;
+      busyRef.current = true;
+      const generation = generationRef.current;
+
       const history = [...turnsRef.current, { role: "user" as const, text: userText }];
       setTurns(history);
       setThinking(true);
       setError(null);
       const result = await askFairaAi(history);
+      busyRef.current = false;
+      // Stop or Clear was pressed while this answer was in flight — drop it silently.
+      if (generation !== generationRef.current) return;
       setThinking(false);
       if (!result.ok) setError(result.detail ?? result.engine);
       const replyIndex = history.length;
@@ -105,14 +103,27 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     if (!supported) return undefined;
     const Ctor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new Ctor();
+    // One utterance per tap. With continuous mode Chrome keeps the session's results
+    // list and re-fires index 0, which made the agent answer the same sentence twice.
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-IN";
+
     recognition.onresult = (event: any) => {
-      const text = String(event?.results?.[0]?.[0]?.transcript ?? "").trim();
+      const results = event?.results;
+      if (!results?.length) return;
+      let text = "";
+      for (let i = Number(event.resultIndex ?? 0); i < results.length; i++) {
+        if (results[i]?.isFinal) text += String(results[i][0]?.transcript ?? "");
+      }
+      text = text.trim();
       if (!text) return;
+      // Chrome can re-fire the same final transcript; never ask the brain twice for one sentence.
+      const lastAsked = [...turnsRef.current].reverse().find((t) => t.role === "user")?.text;
+      if (text === lastAsked) return;
       answerRef.current(text);
     };
+
     recognition.onerror = (event: any) => {
       const code = event?.error;
       setError(
@@ -128,6 +139,7 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     };
     recognition.onend = () => setListening(false);
     recognitionRef.current = recognition;
+
     return () => {
       recognition.onresult = null;
       recognition.onerror = null;
@@ -137,9 +149,22 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     };
   }, [supported]);
 
+  useEffect(() => {
+    let alive = true;
+    getFairaAiStatus().then((status) => {
+      if (alive) setBrain(status);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const stopSpeaking = () => {
+    // Anything still in flight from the previous question must never start speaking.
+    generationRef.current += 1;
     window.speechSynthesis?.cancel();
     setSpeaking(false);
+    setThinking(false);
     stopTyping();
   };
 
@@ -164,11 +189,6 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
     }
   };
 
-  const previewVoice = (id: VoiceId) => {
-    setVoiceId(id);
-    speak(VOICES[id].sample, id);
-  };
-
   const sendTyped = (event?: React.FormEvent) => {
     event?.preventDefault();
     const text = typed.trim();
@@ -189,31 +209,14 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#E05A33]">Live AI Voice Demo</p>
           <h3 className={`font-light uppercase tracking-widest text-white ${compact ? "text-lg" : "text-2xl"}`}>Talk to FAIRA</h3>
         </div>
-        <div className="flex gap-2">
-          {VOICE_IDS.map((id) => {
-            const active = id === voiceId;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => previewVoice(id)}
-                aria-pressed={active}
-                className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 hover:scale-[1.02] ${
-                  active
-                    ? "border-[#E05A33] bg-[#E05A33]/15 text-white shadow-[0_0_18px_rgba(224,90,51,0.35)]"
-                    : "border-white/15 bg-white/5 text-zinc-300 hover:border-[#E05A33]/50"
-                }`}
-              >
-                {VOICES[id].label}
-                <span className="ml-2 text-[9px] font-medium normal-case tracking-normal text-zinc-500">{VOICES[id].hint}</span>
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-500">
-        AI brain: Google Gemini · gemini-1.5-flash · Voice engine: browser default
+        {brain === null
+          ? "AI brain: checking connection…"
+          : brain.configured
+            ? `AI brain: Google Gemini · ${brain.model ?? "live"} · Voice engine: browser default`
+            : "AI brain: not connected (server needs GEMINI_API_KEY) · Voice engine: browser default"}
       </p>
 
       {!supported && (
@@ -241,7 +244,7 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
         <div className="min-h-[44px] flex-1">
           {listening && (
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-rose-400">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-rose-500" /> Listening…
+              <span className="h-2 w-2 animate-pulse rounded-full bg-rose-500" /> Listening… Speak now.
             </p>
           )}
           {thinking && !listening && (
@@ -249,12 +252,12 @@ export function VoiceAgent({ compact = false }: { compact?: boolean }) {
           )}
           {speaking && !listening && !thinking && (
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E05A33]">
-              <Volume2 size={14} /> {VOICES[voiceId].label} is speaking…
+              <Volume2 size={14} /> FAIRA AI is speaking…
             </p>
           )}
           {!listening && !speaking && !thinking && (
             <p className="text-sm text-zinc-400">
-              {turns.length ? `Speaking as ${VOICES[voiceId].label}. Ask about our services.` : "Tap the mic and ask something like “what do your AI agents do?”"}
+              {turns.length ? "Ask another question." : "Tap the mic and ask something like “what do your AI agents do?”"}
             </p>
           )}
           {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}

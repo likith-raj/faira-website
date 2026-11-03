@@ -121,8 +121,15 @@ export async function POST(req: Request) {
     });
   }
 
+  // Google's "high demand" is a temporary spike on the busiest model, so after the other
+  // candidates have failed, give the best one a second try with a short backoff.
+  const attempts = candidates.slice(0, 5);
+  if (attempts.length) attempts.push(attempts[0]);
+
   let lastDetail = "";
-  for (const model of candidates.slice(0, 4)) {
+  for (let i = 0; i < attempts.length; i++) {
+    const model = attempts[i];
+    if (i === attempts.length - 1) await new Promise((r) => setTimeout(r, 1500));
     try {
       const res = await fetch(`${BASE}/models/${model}:generateContent`, {
         method: "POST",

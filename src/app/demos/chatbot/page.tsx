@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Bot, X, Send, ArrowLeft } from "lucide-react";
+import FairaDemoBadge from "@/components/FairaDemoBadge";
 import { askFairaAi, type AiTurn } from "@/lib/ai";
 
 export default function ChatbotDemo() {
@@ -40,10 +42,15 @@ export default function ChatbotDemo() {
         <ArrowLeft size={16} /> Back to Demos
       </Link>
 
-      <div className="max-w-4xl mx-auto text-center mt-20">
-        <h1 className="text-4xl md:text-6xl font-light uppercase tracking-widest mb-6">FAIRA AI Assistant</h1>
-        <p className="text-xl text-gray-400 mb-12">Talk to our AI. It knows everything about our services.</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="max-w-4xl mx-auto text-center mt-20"
+      >
+        <h1 className="text-3xl md:text-5xl font-light uppercase tracking-widest mb-6">FAIRA AI Assistant</h1>
+        <p className="text-lg text-gray-400 mb-12">Talk to our AI. It knows everything about our services.</p>
+      </motion.div>
 
       <button onClick={() => setIsOpen(true)} className="fixed bottom-8 right-8 bg-[#E05A33] p-4 rounded-full shadow-lg hover:scale-105 transition-transform z-50">
         <Bot size={32} className="text-white" />
@@ -71,6 +78,7 @@ export default function ChatbotDemo() {
           </div>
         </div>
       )}
+      <FairaDemoBadge />
     </div>
   );
 }

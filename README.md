@@ -67,28 +67,31 @@ FAIRA never publishes rates. Keep it that way — no price figures anywhere on t
 ### Live train data (/demos/train-voice)
 
 `src/app/api/train-status/route.ts` calls the RapidAPI app **Indian Railway IRCTC** with
-`RAPIDAPI_KEY`. The host must be exactly `indian-railway-irctc.p.rapidapi.com` (no "s" in
-"railway") and the endpoint is `/api/v1/liveTrainStatus?trainNo=<no>&startDay=0` — the plural
-host returns HTTP 404 for every call. Override it with `RAPIDAPI_HOST` only if RapidAPI renames
-the app again.
-
-Any failure (missing key, HTTP error, unreadable JSON, network timeout) returns
-`source: "sample"` with a `note` explaining why, and the page shows a "Source: sample data (not
-live)" badge plus an "FAIRA AI (sample):" transcript label. It never passes fake data off as live.
-Test number: 12759 (Charminar Express).
-
-Status check on this machine (2026-11-01): `RAPIDAPI_KEY` is present and RapidAPI accepts it, but
-every path on that host — including `/api/v1/liveTrainStatus` — answers HTTP 404
-`Endpoint does not exist`, so the demo currently falls back to clearly-labelled sample data. That
-means the key is not subscribed to that app, or the app renamed its endpoint. Fix without touching
-code: on rapidapi.com open the app → **Endpoints** → *Live Train Status* → copy the request URL
-(Code → Node.js) into `.env.local` as
+`RAPIDAPI_KEY`. Verified against the live API on 2026-11-03:
 
 ```
-RAPIDAPI_TRAIN_URL=https://<host>/<path>?trainNo={no}&startDay=0
+GET https://indian-railway-irctc.p.rapidapi.com/api/trains/v1/train/status
+    ?train_number=12759&departure_date=20261103&isH5=true&client=web
 ```
 
-then restart. The route replaces `{no}` with the train number.
+- Host must be exactly `indian-railway-irctc.p.rapidapi.com` (no "s" in "railway").
+- `isH5=true` **and** `client=web` are required. Without them the API answers
+  `400 "'Live Train Status' feature is not supported on this version"`.
+- `departure_date` is required, as `YYYYMMDD` (today in IST by default; `?date=` overrides it).
+- No two-step search is needed: this app has no search/detail endpoint (they answer
+  `404 Endpoint does not exist`), and the status endpoint takes the train number directly.
+- The reply is built from `body.current_station` (mapped to a station name through
+  `body.stations`), `body.train_status_message`, the schedule-vs-actual delay of the stations
+  already passed, and the next scheduled stop.
+
+Override the path with `RAPIDAPI_TRAIN_URL` (base URL only, no query string — the four
+parameters above are appended by the code) if RapidAPI ever moves the endpoint.
+
+Any failure (missing key, HTTP error, `result: "failure"`, unreadable JSON, network timeout)
+returns `source: "sample"`, `label: "Sample (API error)"` and a `note` explaining why; the page
+shows "Source: Sample (API error) — not live" plus an "FAIRA AI (sample):" transcript label. It
+never passes fake data off as live. Test numbers that had live data on 2026-11-03: 12759, 12051,
+12715.
 
 ## What the voice widget does
 

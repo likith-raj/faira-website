@@ -1,77 +1,55 @@
 export type AiTurn = { role: "user" | "ai"; text: string };
 
-const SYSTEM_PROMPT = `You are FAIRA AI, a helpful assistant for an AI automation agency in Nellore. 
-Answer questions about voice agents, chat agents, and automation. 
-Never mention pricing. 
-If you don't know something, say "I'm not sure, but I can connect you to a human."`;
+export type AiAnswer = {
+  ok: boolean;
+  reply: string;
+  engine: string;
+  model?: string;
+  detail?: string;
+};
 
-export async function askFairaAi(history: AiTurn[]): Promise<{ ok: boolean; reply: string; engine: string; detail?: string }> {
-  const apiKey = process.env.GEMINI_API_KEY;
+const FALLBACK = "I did not get an answer that time. Please ask again, or message us on WhatsApp.";
 
-  if (!apiKey) {
+/**
+ * The Gemini key lives in the server environment and is only ever read by /api/chat.
+ * Nothing here may contain a key: everything in this file ships to the browser.
+ */
+export async function askFairaAi(history: AiTurn[]): Promise<AiAnswer> {
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ messages: history }),
+      signal: AbortSignal.timeout(30000)
+    });
+    const data = await res.json().catch(() => null);
+    const reply = String(data?.reply ?? "").trim() || FALLBACK;
+    return {
+      ok: Boolean(data?.ok) && reply.length > 0,
+      reply,
+      engine: String(data?.engine ?? "unknown"),
+      model: data?.model ? String(data.model) : undefined,
+      detail: data?.detail ? String(data.detail) : undefined
+    };
+  } catch (err: any) {
+    const timedOut = err?.name === "TimeoutError";
     return {
       ok: false,
-      reply: "The AI brain is not connected. Please add GEMINI_API_KEY to your .env.local file.",
-      engine: "unconfigured",
+      reply: timedOut
+        ? "My AI brain took too long to answer that one. Please ask again."
+        : "I could not reach the AI service. Check your connection, or message us on WhatsApp.",
+      engine: timedOut ? "timeout" : "network-error",
+      detail: String(err?.message ?? err)
     };
   }
+}
 
-  const contents = history.map((turn) => ({
-    role: turn.role === "user" ? "user" : "model",
-    parts: [{ text: turn.text }],
-  }));
-
+export async function getFairaAiStatus(): Promise<{ configured: boolean; model: string | null }> {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: contents,
-          systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Gemini API Error:", errorData);
-      return {
-        ok: false,
-        reply: `I'm having trouble connecting right now. (Error: ${response.status})`,
-        engine: "gemini-rest",
-        detail: JSON.stringify(errorData),
-      };
-    }
-
-    const data = await response.json();
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!aiText) {
-      return {
-        ok: false,
-        reply: "I couldn't generate a response. Please try asking in a different way.",
-        engine: "gemini-rest",
-      };
-    }
-
-    return {
-      ok: true,
-      reply: aiText,
-      engine: "gemini-2.5-flash",
-    };
-  } catch (error: any) {
-    console.error("Fetch Error:", error);
-    return {
-      ok: false,
-      reply: "I'm having a network issue. Please check your internet and try again.",
-      engine: "network-error",
-      detail: error?.message,
-    };
+    const res = await fetch("/api/chat", { signal: AbortSignal.timeout(15000), cache: "no-store" });
+    const data = await res.json().catch(() => null);
+    return { configured: Boolean(data?.configured), model: data?.model ? String(data.model) : null };
+  } catch {
+    return { configured: false, model: null };
   }
 }

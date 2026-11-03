@@ -9,9 +9,9 @@ export default function StructureFlowScene() {
         variant="structure-flow"
         speed={1.0}
         pointSize={0.08}
-        opacity={0.65}
-        maskStart={0.3}
-        maskSolid={0.5}
+        opacity={0.9}
+        maskStart={0.45}
+        maskSolid={0.7}
       />
     </div>
   );

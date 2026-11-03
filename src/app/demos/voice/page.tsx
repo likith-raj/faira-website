@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import FairaDemoBadge from "@/components/FairaDemoBadge";
 import { VoiceAgent } from "@/components/VoiceAgent";
@@ -15,7 +16,12 @@ const SUGGESTIONS = [
 export default function VoiceAgentDemo() {
   return (
     <div className="relative flex min-h-screen flex-col items-center p-6 md:p-12">
-      <div className="w-full max-w-3xl">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="w-full max-w-3xl"
+      >
         <Link
           href="/demos"
           className="mb-12 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[#E05A33] hover:underline"
@@ -51,7 +57,7 @@ export default function VoiceAgentDemo() {
           Chrome and Edge work best. The microphone is requested the first time you tap it, and speech is
           transcribed on your device — only the finished text is sent to the AI.
         </p>
-      </div>
+      </motion.div>
       <FairaDemoBadge />
     </div>
   );

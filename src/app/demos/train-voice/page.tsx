@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowLeft, Mic, Square, TrainFront, Volume2 } from "lucide-react";
 import FairaDemoBadge from "@/components/FairaDemoBadge";
 
@@ -36,8 +37,11 @@ export default function TrainVoiceDemo() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
+  const [label, setLabel] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef<HTMLDivElement | null>(null);
+  /** Guards against one utterance firing the fetch twice while a request is already running. */
+  const busyRef = useRef(false);
 
   useEffect(() => {
     const el = transcriptRef.current;
@@ -66,21 +70,24 @@ export default function TrainVoiceDemo() {
     }
 
     setBusy(true);
+    busyRef.current = true;
     setNote(null);
     try {
       const res = await fetch(`/api/train-status?train=${found[0]}`);
       const data = await res.json();
       const reply = String(data?.text ?? "No status came back for that train.");
       setSource(data?.source ?? null);
+      setLabel(data?.label ? String(data.label) : null);
       if (data?.note) setNote(String(data.note));
       else if (data?.source === "sample")
-        setNote("Sample data (not live) — add a valid RAPIDAPI_KEY to .env.local for live railway status.");
+        setNote("Sample (API error) — the live railway API did not answer, so this reply is sample data, not live.");
       setLines((prev) => [...prev, { role: "ai", text: reply, source: data?.source }]);
       setSpeaking(true);
       speakLine(reply, () => setSpeaking(false));
     } catch {
       const reply = "I could not reach the railway data service. Please try again.";
       setSource("network-error");
+      setLabel(null);
       setLines((prev) => [...prev, { role: "ai", text: reply, source: "network-error" }]);
       setSpeaking(true);
       speakLine(reply, () => setSpeaking(false));
@@ -100,7 +107,13 @@ export default function TrainVoiceDemo() {
     recognition.interimResults = false;
     recognition.lang = "en-IN";
     recognition.onresult = (event: any) => {
-      const text = String(event?.results?.[0]?.[0]?.transcript ?? "").trim();
+      if (busyRef.current) return;
+      const results = event?.results;
+      let text = "";
+      for (let i = Number(event?.resultIndex ?? 0); i < (results?.length ?? 0); i++) {
+        if (results[i]?.isFinal) text += String(results[i][0]?.transcript ?? "");
+      }
+      text = text.trim();
       if (text) askRef.current(text);
     };
     recognition.onerror = (event: any) => {
@@ -145,7 +158,12 @@ export default function TrainVoiceDemo() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center p-6 md:p-12">
-      <div className="w-full max-w-3xl">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="w-full max-w-3xl"
+      >
         <Link
           href="/demos"
           className="mb-12 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[#E05A33] hover:underline"
@@ -169,7 +187,7 @@ export default function TrainVoiceDemo() {
               {source === "rapidapi"
                 ? "Source: live railway API"
                 : source === "sample"
-                  ? "Source: sample data (not live)"
+                  ? `Source: ${label ?? "Sample (API error)"} — not live`
                   : source
                     ? `Source: ${source}`
                     : "Source: not fetched yet"}
@@ -290,6 +308,7 @@ export default function TrainVoiceDemo() {
                   setLines([]);
                   setNote(null);
                   setSource(null);
+                  setLabel(null);
                 }}
                 className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-200 transition-all hover:border-[#E05A33]/60 hover:text-[#E05A33]"
               >
@@ -310,12 +329,12 @@ export default function TrainVoiceDemo() {
         </div>
 
         <p className="mt-8 text-center text-xs text-zinc-500">
-          Live status needs a RapidAPI key for the &ldquo;Indian Railway IRCTC&rdquo; app (host{" "}
-          <code className="text-zinc-400">indian-railway-irctc.p.rapidapi.com</code>) in{" "}
-          <code className="text-zinc-400">RAPIDAPI_KEY</code>. Without it the demo clearly says it is showing
-          sample data.
+          Live status comes from the &ldquo;Indian Railway IRCTC&rdquo; app on RapidAPI (host{" "}
+          <code className="text-zinc-400">indian-railway-irctc.p.rapidapi.com</code>), fetched server-side with the{" "}
+          <code className="text-zinc-400">RAPIDAPI_KEY</code> in your environment. If that call ever fails, the demo
+          switches to data clearly labelled <span className="text-amber">Sample (API error)</span>.
         </p>
-      </div>
+      </motion.div>
       <FairaDemoBadge />
     </div>
   );
